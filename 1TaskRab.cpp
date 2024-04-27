@@ -7,7 +7,7 @@ using namespace std;
 bool findExpression(vector<int> numbers, int target, int currentSum, string currentExpression, vector<bool>& used) {
     // Базовый случай: если текущая сумма равна целевому значению, значит решение найдено
     if (currentSum == target) {
-        cout << currentExpression << " = " << target << endl;
+        cout << currentExpression.substr(1) << " = " << target << endl;
         return true;
     }
 
