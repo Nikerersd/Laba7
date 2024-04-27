@@ -7,7 +7,7 @@ using namespace std;
 bool findExpression(vector<int> numbers, int target, int currentSum, string currentExpression, vector<bool>& used) {
     // Базовый случай: если текущая сумма равна целевому значению, значит решение найдено
     if (currentSum == target) {
-        cout << currentExpression.substr(1) << " = " << target << endl;
+        cout << currentExpression << " = " << target << endl;
         return true;
     }
 
@@ -45,9 +45,15 @@ int main() {
     cout << "Введите целевое число: ";
     cin >> target;
 
-    if (!findExpression(numbers, target, 0, "", used)) {
-        cout << "Невозможно получить заданное число используя эти числа и операции сложения и умножения." << endl;
+    // Пробуем каждое число в качестве начального числа в выражении
+    for (size_t i = 0; i < numbers.size(); i++) {
+        used[i] = true;
+        if (findExpression(numbers, target, numbers[i], to_string(numbers[i]), used))
+            return 0;
+        used[i] = false;
     }
+
+    cout << "Невозможно получить заданное число используя эти числа и операции сложения и умножения." << endl;
 
     return 0;
 }
