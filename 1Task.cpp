@@ -1,59 +1,53 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 using namespace std;
 
-// Функция для проверки, можно ли получить сумму S из элементов вектора numbers
-bool canGetSum(vector<int>& numbers, int S, size_t index = 0, int currentSum = 0) {
-    // Если текущая сумма равна S, значит, можно получить сумму из элементов вектора
-    if (currentSum == S)
+bool findExpression(vector<int> numbers, int target, int currentSum, string currentExpression, vector<bool>& used) {
+    if (currentSum == target) {
+        cout << currentExpression << " = " << target << endl;
         return true;
-    
-    // Базовый случай: если мы прошлись по всем числам или текущая сумма больше S
-    if (index == numbers.size() || currentSum > S)
-        return false;
-    
-    // Рекурсивно проверяем, можно ли получить S с добавлением текущего числа
-    if (canGetSum(numbers, S, index + 1, currentSum + numbers[index]))
-        return true;
-    
-    // Рекурсивно проверяем, можно ли получить S с умножением на текущее число
-    if (canGetSum(numbers, S, index + 1, currentSum * numbers[index]))
-        return true;
+    }
 
-    // Рекурсивно проверяем, можно ли получить S с добавлением текущего числа к предыдущему умноженному числу
-    if (index > 0 && canGetSum(numbers, S, index + 1, (currentSum - numbers[index - 1]) + numbers[index - 1] * numbers[index]))
-        return true;
-    
-    // Если ни одно из действий не приводит к S
+    for (size_t i = 0; i < numbers.size(); i++) {
+        if (used[i]) continue;
+
+        used[i] = true;
+        if (findExpression(numbers, target, currentSum + numbers[i], currentExpression + "+" + to_string(numbers[i]), used))
+            return true;
+        used[i] = false;
+
+        used[i] = true;
+        if (findExpression(numbers, target, currentSum * numbers[i], currentExpression + "*" + to_string(numbers[i]), used))
+            return true;
+        used[i] = false;
+    }
     return false;
 }
 
 int main() {
-    // Заданные значения N и S
-    int N, S;
-    cout << "Введите количество двузначных чисел N: ";
-    cin >> N;
-    cout << "Введите число S: ";
-    cin >> S;
-
-    // Вектор для хранения двузначных чисел
-    vector<int> numbers(N);
-    cout << "Введите " << N << " двузначных чисел:\n";
-    for (int i = 0; i < N; ++i) {
+    int n, target;
+    cout << "Введите количество двузначных чисел: ";
+    cin >> n;
+    vector<int> numbers(n);
+    vector<bool> used(n, false);
+    cout << "Введите " << n << " двузначных чисел:\n";
+    for (int i = 0; i < n; i++) {
         cin >> numbers[i];
-        // Проверяем, что числа двузначные
-        if (numbers[i] < 10 || numbers[i] > 99) {
-            cout << "Число должно быть двузначным. Пожалуйста, введите снова: ";
-            cin >> numbers[i];
-        }
+    }
+    cout << "Введите целевое число: ";
+    cin >> target;
+
+    // Пробуем каждое число в качестве начального числа в выражении
+    for (size_t i = 0; i < numbers.size(); i++) {
+        used[i] = true;
+        if (findExpression(numbers, target, numbers[i], to_string(numbers[i]), used))
+            return 0;
+        used[i] = false;
     }
 
-    // Проверяем, можно ли получить сумму S из заданных чисел
-    if (canGetSum(numbers, S))
-        cout << "Можно получить сумму " << S << " из заданных чисел.\n";
-    else
-        cout << "Нельзя получить сумму " << S << " из заданных чисел.\n";
+    cout << "Невозможно получить заданное число используя эти числа и операции сложения и умножения." << endl;
 
     return 0;
 }
